@@ -84,9 +84,9 @@ async def process_image(quote: Quote, avatar_image: bytes, nickname: str = None)
             avg_color = calculate_average_color(cv_image)
             template = cv2.imread("base-2.png",  cv2.IMREAD_UNCHANGED)
             # 里面请使用同步方法
-            result = draw_quote_segments(quote, avg_color, (173, 69, 63), "Minecraft像素风格字体(从游戏中提取,支持中英文).ttf", 42)
+            result = draw_quote_segments(quote, avg_color, (173, 69, 63), "YaHei Consolas Hybrid 1.12.ttf", 42)
             
-            result = append_avatar(result, cv_image, (173, 69, 63), "Minecraft像素风格字体(从游戏中提取,支持中英文).ttf", 28, signature=nickname, template=template)
+            result = append_avatar(result, cv_image, (173, 69, 63), "YaHei Consolas Hybrid 1.12.ttf", 28, signature=nickname, template=template)
             
             # result = cv_image
 

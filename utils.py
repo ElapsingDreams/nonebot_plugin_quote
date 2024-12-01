@@ -50,6 +50,7 @@ def split_text_to_fit(draw: ImageDraw.Draw, text: str, font: ImageFont.FreeTypeF
             test_line = f"{current_line}{char}"
             
             test_bbox = draw.textbbox((0, 0), test_line, font=font)
+            # print(test_bbox, test_line)
             test_width = test_bbox[2] - test_bbox[0]
             if test_width <= max_width:
                 current_line = test_line

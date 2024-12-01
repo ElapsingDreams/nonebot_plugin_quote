@@ -29,7 +29,7 @@ def draw_quote_segments(quote: Quote, textcolor: tuple, bg_color: tuple, font_pa
 
             text_lines = split_text_to_fit(draw, text, font, MAX_WIDTH)
 
-            text_height = sum([(font.getbbox(line)[3] - font.getbbox(line)[1]) + LINE_SPACING for line in text_lines]) + LINE_SPACING
+            text_height = sum([(font.getbbox(line)[3]) + LINE_SPACING for line in text_lines]) + LINE_SPACING  #  - font.getbbox(line)[1]
 
             text_image = Image.new('RGBA', (MAX_WIDTH, text_height), (173, 69, 63, 0))
             draw = ImageDraw.Draw(text_image)
@@ -40,7 +40,7 @@ def draw_quote_segments(quote: Quote, textcolor: tuple, bg_color: tuple, font_pa
                 text_width = text_bbox[2] - text_bbox[0]
                 text_x = (MAX_WIDTH - text_width) // 2  
                 draw.text((text_x, current_y), line, fill=textcolor, font=font)
-                current_y += (font.getbbox(line)[3] - font.getbbox(line)[1]) + LINE_SPACING
+                current_y += (font.getbbox(line)[3]) + LINE_SPACING  # - font.getbbox(line)[1]
             
             segments_images.append(np.array(text_image.convert('RGB')))
             total_height += text_height # + LINE_SPACING
@@ -82,7 +82,7 @@ def draw_quote_segments(quote: Quote, textcolor: tuple, bg_color: tuple, font_pa
 
             text_lines = split_text_to_fit(draw, text, font, MAX_WIDTH)
 
-            text_height = sum([(font.getbbox(line)[3] - font.getbbox(line)[1]) + LINE_SPACING for line in text_lines]) + LINE_SPACING
+            text_height = sum([(font.getbbox(line)[3] ) + LINE_SPACING for line in text_lines]) + LINE_SPACING  #  - font.getbbox(line)[1]
 
             text_image = Image.new('RGBA', (MAX_WIDTH, text_height), (173, 69, 63, 0))
             draw = ImageDraw.Draw(text_image)
@@ -93,7 +93,7 @@ def draw_quote_segments(quote: Quote, textcolor: tuple, bg_color: tuple, font_pa
                 text_width = text_bbox[2] - text_bbox[0]
                 text_x = (MAX_WIDTH - text_width) // 2  
                 draw.text((text_x, current_y), line, fill=textcolor, font=font)
-                current_y += (font.getbbox(line)[3] - font.getbbox(line)[1]) + LINE_SPACING
+                current_y += (font.getbbox(line)[3]) + LINE_SPACING  # - font.getbbox(line)[1]
             
             segments_images.append(np.array(text_image.convert('RGB')))
             total_height += text_height # + LINE_SPACING
@@ -154,10 +154,10 @@ def append_avatar(quote_img: np.ndarray, avatar: np.ndarray, bg_color: tuple, fo
     # Calculate signature height
     font = ImageFont.truetype(font_path, font_size)
     lines = split_text_to_fit(ImageDraw.Draw(Image.new('RGB', (1, 1))), f'——{signature}', font, image.shape[1])
-    signature_height = sum([(font.getbbox(line)[3] - font.getbbox(line)[1]) for line in lines])
+    signature_height = sum([(font.getbbox(line)[3]) for line in lines])   #  - font.getbbox(line)[1]
 
     combined_width = w + margin + image.shape[1]
-    combined_height = max(h + margin * 2, image.shape[0] + margin //2 + signature_height)
+    combined_height = max(h + margin * 2, image.shape[0] - margin // 4 + signature_height)
     
     offset_quote = (combined_height - h) // 2
     offset_image = 0  # (combined_height - image.shape[0]) // 2
@@ -176,10 +176,10 @@ def append_avatar(quote_img: np.ndarray, avatar: np.ndarray, bg_color: tuple, fo
         bbox = signature_draw.textbbox((0, 0), line, font=font)
         x_centered = (image.shape[1] - (bbox[2] - bbox[0])) // 2
         signature_draw.text((x_centered, y_offset), line, font=font, fill=(255, 255, 255))
-        y_offset += (font.getbbox(line)[3] - font.getbbox(line)[1])
+        y_offset += (font.getbbox(line)[3])  # - font.getbbox(line)[1]
 
     signature_cv = np.array(signature_image)
-    offset_signature = offset_image + image.shape[0]
+    offset_signature = offset_image + image.shape[0] - margin // 2
     combined_image[offset_signature:offset_signature + signature_height, :image.shape[1]] = signature_cv[:, :, :3]
 
     return combined_image
