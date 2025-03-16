@@ -16,9 +16,12 @@ from .utils import calculate_average_color, get_avatar
 from .typing import Quote
 from .protract import draw_quote_segments, append_avatar
 
-FONT_PATH = Path("YaHei Consolas Hybrid 1.12.ttf")
-SUB_FONT_PATH = Path("YaHei Consolas Hybrid 1.12.ttf")
-
+FONT_PATH = Path("NotoSansCJK-Regular.ttc")
+SUB_FONT_PATH = Path("NotoSansCJK-Regular.ttc")
+'''
+FONT_PATH = None
+SUB_FONT_PATH = None
+'''
 quote_cmd = Alconna(".quote")
 quote_alc = on_alconna(quote_cmd, aliases={".qt", "qt"})
 
@@ -37,7 +40,6 @@ async def handle_command(bot: Bot, event: Event):
     if avatar_image is None:
         await quote_alc.send(UniMessage.text("无法获取用户头像，请检查网络连接。"))
         return
-        
     quoteMsg = await Quote.create(event.reply.message)
 
     image = await process_image(quoteMsg, avatar_image, nickname)
@@ -78,15 +80,17 @@ async def process_image(quote: Quote, avatar_image: bytes, nickname: str = None)
     loop = asyncio.get_event_loop()
     
     def _process():
-        try:
+        if True:
             image = Image.open(BytesIO(avatar_image))
             cv_image = cv2.cvtColor(np.array(image), cv2.COLOR_RGBA2BGRA)
             avg_color = calculate_average_color(cv_image)
+            constant_color = (255, 255, 255)
             template = cv2.imread("base-2.png",  cv2.IMREAD_UNCHANGED)
             # 里面请使用同步方法
-            result = draw_quote_segments(quote, avg_color, (173, 69, 63), "YaHei Consolas Hybrid 1.12.ttf", 42)
-            
-            result = append_avatar(result, cv_image, (173, 69, 63), "YaHei Consolas Hybrid 1.12.ttf", 28, signature=nickname, template=template)
+            # (173, 69, 63) (13, 13, 13)
+            result = draw_quote_segments(quote, constant_color, (173, 69, 63), FONT_PATH, 42)
+            # margin: np.ndarray = [上, 左, 下, 右, 中, 签]
+            result = append_avatar(result, cv_image, (173, 69, 63), SUB_FONT_PATH, 28, signature=nickname, template=template, margin=[30, 30, 30, 30, 30, 30], signature_position = 1)
             
             # result = cv_image
 
@@ -94,10 +98,11 @@ async def process_image(quote: Quote, avatar_image: bytes, nickname: str = None)
                 return Image.fromarray(result)
             else:
                 return None
-        except Exception as e:
+        
+        '''except Exception as e:
             print(e)
             logger.warning(f"An error occurred during image processing: {e}")
-            return None
+            return None'''
     
     return await loop.run_in_executor(None, _process)
 
